@@ -115,6 +115,39 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+function SwiftPill({
+  label,
+  detail,
+  testid,
+}: {
+  label: string;
+  detail: string;
+  testid: string;
+}) {
+  return (
+    <div
+      className="rounded-2xl border border-border/60 bg-secondary/25 px-3 py-2"
+      data-testid={testid}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-sm font-medium" data-testid={`${testid}-label`}>
+          {label}
+        </div>
+        <Badge
+          variant="secondary"
+          className="rounded-full border border-border/60 bg-secondary/60 font-mono text-[11px]"
+          data-testid={`${testid}-tag`}
+        >
+          Swift
+        </Badge>
+      </div>
+      <div className="mt-1 text-xs text-muted-foreground" data-testid={`${testid}-detail`}>
+        {detail}
+      </div>
+    </div>
+  );
+}
+
 function Metric({
   icon,
   label,
@@ -135,7 +168,10 @@ function Metric({
         <span>{label}</span>
       </div>
       <div className="mt-3 flex items-baseline gap-2">
-        <div className="text-2xl font-semibold tracking-tight text-foreground" data-testid={`${testid}-value`}>
+        <div
+          className="text-2xl font-semibold tracking-tight text-foreground"
+          data-testid={`${testid}-value`}
+        >
           {value}
         </div>
         <div className="text-xs text-muted-foreground" data-testid={`${testid}-sub`}>
@@ -244,8 +280,8 @@ export default function Home() {
                 className="mt-3 text-pretty text-base leading-relaxed text-muted-foreground"
                 data-testid="text-subtitle"
               >
-                A frontend prototype for an end-to-end pipeline: capture audio/video/sensor events, time-stamp them, and
-                explore behavior patterns in a calm, high-signal dashboard.
+                MVP architecture: audio recording with context capture, timestamped sessions, contextual notes, local storage,
+                and basic pattern viewing (ML integration later).
               </p>
             </div>
 
@@ -490,21 +526,34 @@ export default function Home() {
                     <div className="rounded-2xl border border-border/60 bg-secondary/25 p-3">
                       <div className="flex items-center gap-2 text-sm font-medium" data-testid="text-actions-title">
                         <Filter className="h-4 w-4 text-foreground/80" />
-                        Next interactions to prototype
+                        Key components (Swift app)
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge className="rounded-full" variant="secondary" data-testid="badge-next-upload">
-                          Upload clip
-                        </Badge>
-                        <Badge className="rounded-full" variant="secondary" data-testid="badge-next-label">
-                          Label behaviors
-                        </Badge>
-                        <Badge className="rounded-full" variant="secondary" data-testid="badge-next-correlate">
-                          Correlate contexts
-                        </Badge>
-                        <Badge className="rounded-full" variant="secondary" data-testid="badge-next-export">
-                          Export dataset
-                        </Badge>
+                      <div className="mt-3 grid gap-2">
+                        <SwiftPill
+                          label="AudioRecorder"
+                          detail="Handles recording sessions (AVFoundation), permissions, and file lifecycle."
+                          testid="pill-audiorecorder"
+                        />
+                        <SwiftPill
+                          label="VocalizationModel"
+                          detail="Stores recordings + context, duration, tags, and derived metadata."
+                          testid="pill-vocalizationmodel"
+                        />
+                        <SwiftPill
+                          label="ContextCapture"
+                          detail="UI for situational notes (what happened, location, activity, mood)."
+                          testid="pill-contextcapture"
+                        />
+                        <SwiftPill
+                          label="SessionManager"
+                          detail="Organizes timestamped sessions and groups events/recordings."
+                          testid="pill-sessionmanager"
+                        />
+                        <SwiftPill
+                          label="PatternAnalyzer"
+                          detail="Phase 2: basic correlations + Charts-ready aggregates (ML later)."
+                          testid="pill-patternanalyzer"
+                        />
                       </div>
                     </div>
                   </div>
