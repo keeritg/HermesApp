@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
+import { ArchitectureOverview } from "@/components/architecture-overview";
 
 type CaptureMode = "audio" | "video" | "sensor";
 
@@ -329,10 +330,13 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_.85fr]">
-          <Card className="glass relative overflow-hidden rounded-3xl p-5">
-            <div className="pointer-events-none absolute inset-0 gridline opacity-80" />
-            <div className="relative">
+        <main className="mt-10 grid grid-cols-1 gap-6">
+          <ArchitectureOverview />
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_.85fr]">
+            <Card className="glass relative overflow-hidden rounded-3xl p-5">
+              <div className="pointer-events-none absolute inset-0 gridline opacity-80" />
+              <div className="relative">
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <div className="flex items-center gap-2" data-testid="text-capture-title">
@@ -803,6 +807,7 @@ export default function Home() {
                 </Button>
               </div>
             </Card>
+          </div>
           </div>
         </main>
 
