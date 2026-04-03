@@ -3,6 +3,7 @@ import { Mic, Square, Loader2, Sparkles, AudioLines, Settings2, Plus, Clock, Fil
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
@@ -11,6 +12,8 @@ export default function Home() {
   const [result, setResult] = useState<null | { label: string; confidence: number }>(null);
   const [logSaved, setLogSaved] = useState(false);
   const [contextAdded, setContextAdded] = useState(false);
+  const [showContextInput, setShowContextInput] = useState(false);
+  const [contextText, setContextText] = useState("");
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -26,6 +29,8 @@ export default function Home() {
         setResult({ label: "Short meow (attention)", confidence: 0.86 });
         setLogSaved(false);
         setContextAdded(false);
+        setShowContextInput(false);
+        setContextText("");
       }, 2000);
     } else {
       setResult(null);
@@ -143,34 +148,71 @@ export default function Home() {
                     <p className="text-sm text-muted-foreground">Matches typical patterns for hunger or soliciting attention.</p>
                   </div>
                   
-                  <div className="pt-4 flex gap-2 border-t">
-                    <Button 
-                      variant={contextAdded ? "secondary" : "outline"} 
-                      className="flex-1 rounded-xl transition-colors" 
-                      size="sm"
-                      onClick={() => setContextAdded(true)}
-                      data-testid="button-add-context"
+                  {showContextInput ? (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="pt-4 border-t space-y-3"
                     >
-                      {contextAdded ? (
-                        <><CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> Context Added</>
-                      ) : (
-                        <><Plus className="mr-2 h-4 w-4" /> Add Context</>
-                      )}
-                    </Button>
-                    <Button 
-                      variant={logSaved ? "secondary" : "outline"} 
-                      className="flex-1 rounded-xl transition-colors" 
-                      size="sm"
-                      onClick={() => setLogSaved(true)}
-                      data-testid="button-save-log"
-                    >
-                      {logSaved ? (
-                        <><CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> Saved</>
-                      ) : (
-                        <><FileDown className="mr-2 h-4 w-4" /> Save Log</>
-                      )}
-                    </Button>
-                  </div>
+                      <Input 
+                        placeholder="e.g., by the fridge, next to me at the desk..." 
+                        value={contextText}
+                        onChange={(e) => setContextText(e.target.value)}
+                        className="text-sm rounded-xl"
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="secondary" 
+                          className="flex-1 rounded-xl" 
+                          size="sm"
+                          onClick={() => {
+                            setShowContextInput(false);
+                            if (contextText.trim()) setContextAdded(true);
+                          }}
+                        >
+                          Save Context
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="rounded-xl" 
+                          size="sm"
+                          onClick={() => setShowContextInput(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="pt-4 flex gap-2 border-t">
+                      <Button 
+                        variant={contextAdded ? "secondary" : "outline"} 
+                        className="flex-1 rounded-xl transition-colors" 
+                        size="sm"
+                        onClick={() => setShowContextInput(true)}
+                        data-testid="button-add-context"
+                      >
+                        {contextAdded ? (
+                          <><CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> Context Added</>
+                        ) : (
+                          <><Plus className="mr-2 h-4 w-4" /> Add Context</>
+                        )}
+                      </Button>
+                      <Button 
+                        variant={logSaved ? "secondary" : "outline"} 
+                        className="flex-1 rounded-xl transition-colors" 
+                        size="sm"
+                        onClick={() => setLogSaved(true)}
+                        data-testid="button-save-log"
+                      >
+                        {logSaved ? (
+                          <><CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> Saved</>
+                        ) : (
+                          <><FileDown className="mr-2 h-4 w-4" /> Save Log</>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
