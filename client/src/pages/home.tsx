@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
@@ -14,6 +16,7 @@ export default function Home() {
   const [contextAdded, setContextAdded] = useState(false);
   const [showContextInput, setShowContextInput] = useState(false);
   const [contextText, setContextText] = useState("");
+  const { toast } = useToast();
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -41,6 +44,40 @@ export default function Home() {
         setTime((t) => t + 1);
       }, 1000);
     }
+  };
+
+  const handleSaveLog = () => {
+    if (!result) return;
+
+    // Simulate AI Prediction based on context
+    let prediction = "Based on the acoustic profile, Leo is likely soliciting attention or food.";
+    const lowerContext = contextText.toLowerCase();
+    
+    if (lowerContext.includes("fridge") || lowerContext.includes("kitchen") || lowerContext.includes("food")) {
+      prediction = "Combined with being near the fridge, this specific meow pattern strongly indicates Leo is asking for food or treats.";
+    } else if (lowerContext.includes("desk") || lowerContext.includes("work") || lowerContext.includes("computer")) {
+      prediction = "This is a typical 'interruption' meow. Leo is likely bored and wants your attention away from your work.";
+    } else if (lowerContext.includes("door")) {
+      prediction = "Given the location by the door, this vocalization pattern suggests Leo wants to go out or is reacting to something outside.";
+    }
+
+    const newLog = {
+      id: Math.random().toString(36).substring(7),
+      timestamp: Date.now(),
+      label: result.label,
+      confidence: result.confidence,
+      context: contextText,
+      prediction: prediction
+    };
+
+    const existingLogs = JSON.parse(localStorage.getItem("hermes_logs") || "[]");
+    localStorage.setItem("hermes_logs", JSON.stringify([...existingLogs, newLog]));
+    
+    setLogSaved(true);
+    toast({
+      title: "Log Saved",
+      description: "Leo's vocalization has been saved to history.",
+    });
   };
 
   useEffect(() => {
@@ -202,7 +239,8 @@ export default function Home() {
                         variant={logSaved ? "secondary" : "outline"} 
                         className="flex-1 rounded-xl transition-colors" 
                         size="sm"
-                        onClick={() => setLogSaved(true)}
+                        onClick={handleSaveLog}
+                        disabled={logSaved}
                         data-testid="button-save-log"
                       >
                         {logSaved ? (
@@ -220,9 +258,11 @@ export default function Home() {
         </main>
         
         <footer className="flex justify-center gap-6 text-muted-foreground pt-4">
-          <Button variant="ghost" size="sm" className="rounded-full" data-testid="button-history">
-            <Clock className="mr-2 h-4 w-4" /> History
-          </Button>
+          <Link href="/history">
+            <Button variant="ghost" size="sm" className="rounded-full" data-testid="button-history">
+              <Clock className="mr-2 h-4 w-4" /> History
+            </Button>
+          </Link>
           <Button variant="ghost" size="sm" className="rounded-full" data-testid="button-settings">
             <Settings2 className="mr-2 h-4 w-4" /> Settings
           </Button>
