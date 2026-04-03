@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Mic, Square, Loader2, Sparkles, AudioLines, Settings2, Plus, Clock, FileDown } from "lucide-react";
+import { Mic, Square, Loader2, Sparkles, AudioLines, Settings2, Plus, Clock, FileDown, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,8 @@ export default function Home() {
   const [time, setTime] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<null | { label: string; confidence: number }>(null);
+  const [logSaved, setLogSaved] = useState(false);
+  const [contextAdded, setContextAdded] = useState(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -22,6 +24,8 @@ export default function Home() {
       setTimeout(() => {
         setProcessing(false);
         setResult({ label: "Short meow (attention)", confidence: 0.86 });
+        setLogSaved(false);
+        setContextAdded(false);
       }, 2000);
     } else {
       setResult(null);
@@ -52,10 +56,10 @@ export default function Home() {
         <header className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span data-testid="text-badge">CatSignal AI</span>
+            <span data-testid="text-badge">HermesAI</span>
           </div>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl" data-testid="text-title">
-            What are they saying?
+            What is Leo saying?
           </h1>
           <p className="text-base text-muted-foreground max-w-sm mx-auto" data-testid="text-subtitle">
             Record a vocalization and let AI analyze the pattern and context.
@@ -140,11 +144,31 @@ export default function Home() {
                   </div>
                   
                   <div className="pt-4 flex gap-2 border-t">
-                    <Button variant="outline" className="flex-1 rounded-xl" size="sm">
-                      <Plus className="mr-2 h-4 w-4" /> Add Context
+                    <Button 
+                      variant={contextAdded ? "secondary" : "outline"} 
+                      className="flex-1 rounded-xl transition-colors" 
+                      size="sm"
+                      onClick={() => setContextAdded(true)}
+                      data-testid="button-add-context"
+                    >
+                      {contextAdded ? (
+                        <><CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> Context Added</>
+                      ) : (
+                        <><Plus className="mr-2 h-4 w-4" /> Add Context</>
+                      )}
                     </Button>
-                    <Button variant="outline" className="flex-1 rounded-xl" size="sm">
-                      <FileDown className="mr-2 h-4 w-4" /> Save Log
+                    <Button 
+                      variant={logSaved ? "secondary" : "outline"} 
+                      className="flex-1 rounded-xl transition-colors" 
+                      size="sm"
+                      onClick={() => setLogSaved(true)}
+                      data-testid="button-save-log"
+                    >
+                      {logSaved ? (
+                        <><CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> Saved</>
+                      ) : (
+                        <><FileDown className="mr-2 h-4 w-4" /> Save Log</>
+                      )}
                     </Button>
                   </div>
                 </motion.div>
