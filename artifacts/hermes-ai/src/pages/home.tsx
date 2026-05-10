@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { startRecording, analyzeAudioBlob, type RecordingHandle } from "@/lib/audio-analyzer";
 
 type LogEntry = {
   id: string;
@@ -29,6 +30,7 @@ export default function Home() {
   const { toast } = useToast();
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingHandleRef = useRef<RecordingHandle | null>(null);
 
   const getHistory = (): LogEntry[] => {
     try {
@@ -38,25 +40,56 @@ export default function Home() {
     }
   };
 
-  const toggleRecording = () => {
+  const toggleRecording = async () => {
     if (recording) {
       setRecording(false);
       setProcessing(true);
       if (timerRef.current) clearInterval(timerRef.current);
-
-      setTimeout(() => {
-        setProcessing(false);
-        setResult({ label: "Short meow (attention)", confidence: 0.86 });
-        setLogSaved(false);
-        setContextAdded(false);
-        setShowContextInput(false);
-        setContextText("");
-      }, 2000);
+      recordingHandleRef.current?.stop();
+      recordingHandleRef.current = null;
     } else {
       setResult(null);
+      setProcessing(false);
+
+      if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+        toast({
+          title: "Browser not supported",
+          description: "Your browser doesn't support microphone recording. Try Chrome, Edge, or Firefox.",
+        });
+        return;
+      }
+
+      let handle: RecordingHandle;
+      try {
+        handle = await startRecording(async (blob) => {
+          try {
+            const classification = await analyzeAudioBlob(blob);
+            setResult({ label: classification.label, confidence: classification.confidence });
+          } catch {
+            setProcessing(false);
+            toast({
+              title: "Analysis failed",
+              description: "Couldn't analyze the recording. Please try again.",
+            });
+            return;
+          }
+          setProcessing(false);
+          setLogSaved(false);
+          setContextAdded(false);
+          setShowContextInput(false);
+          setContextText("");
+        });
+      } catch {
+        toast({
+          title: "Microphone access denied",
+          description: "Please allow microphone access in your browser to record Leo's vocalizations.",
+        });
+        return;
+      }
+
+      recordingHandleRef.current = handle;
       setRecording(true);
       setTime(0);
-      setProcessing(false);
       timerRef.current = setInterval(() => {
         setTime((t) => t + 1);
       }, 1000);
@@ -132,6 +165,7 @@ export default function Home() {
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      recordingHandleRef.current?.stop();
     };
   }, []);
 
