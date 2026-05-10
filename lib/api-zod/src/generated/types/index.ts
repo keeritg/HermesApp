@@ -17,3 +17,6 @@ export * from "./anthropicMessage";
 export * from "./anthropicMessageInput";
 export * from "./healthStatus";
 export * from "./historyEntry";
+export * from "./logError";
+export * from "./vocalizationLog";
+export * from "./vocalizationLogInput";

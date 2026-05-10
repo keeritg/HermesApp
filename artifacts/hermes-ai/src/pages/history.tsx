@@ -1,45 +1,39 @@
-import { useState, useEffect } from "react";
-import { Clock, ArrowLeft, Trash2, Sparkles } from "lucide-react";
+import { Clock, ArrowLeft, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-type LogEntry = {
-  id: string;
-  timestamp: number;
-  label: string;
-  confidence: number;
-  context: string;
-  prediction: string;
-};
+import { useGetLogs, useClearLogs, getGetLogsQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function History() {
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("hermes_logs");
-    if (saved) {
-      try {
-        setLogs(JSON.parse(saved).sort((a: LogEntry, b: LogEntry) => b.timestamp - a.timestamp));
-      } catch (e) {
-        console.error("Failed to parse logs", e);
-      }
-    }
-  }, []);
+  const queryClient = useQueryClient();
+  const { data: logs, isLoading } = useGetLogs();
+  const clearLogsMutation = useClearLogs({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetLogsQueryKey() });
+      },
+    },
+  });
 
   const clearHistory = () => {
-    localStorage.removeItem("hermes_logs");
-    setLogs([]);
+    clearLogsMutation.mutate();
   };
 
-  const formatDate = (ts: number) => {
+  const formatDate = (createdAt: string) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
-    }).format(new Date(ts));
+    }).format(new Date(createdAt));
   };
+
+  const sortedLogs = logs
+    ? [...logs].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+    : [];
 
   return (
     <div className="min-h-screen bg-background flex flex-col p-4 md:p-8 max-w-2xl mx-auto">
@@ -52,8 +46,14 @@ export default function History() {
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight">Leo's History</h1>
         </div>
-        {logs.length > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearHistory} className="text-muted-foreground hover:text-destructive">
+        {sortedLogs.length > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearHistory}
+            disabled={clearLogsMutation.isPending}
+            className="text-muted-foreground hover:text-destructive"
+          >
             <Trash2 className="h-4 w-4 mr-2" />
             Clear
           </Button>
@@ -61,7 +61,12 @@ export default function History() {
       </header>
 
       <main className="flex-1">
-        {logs.length === 0 ? (
+        {isLoading ? (
+          <div className="h-64 flex flex-col items-center justify-center text-muted-foreground space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin opacity-40" />
+            <p>Loading history...</p>
+          </div>
+        ) : sortedLogs.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-muted-foreground space-y-4">
             <Clock className="h-12 w-12 opacity-20" />
             <p>No recordings saved yet.</p>
@@ -73,12 +78,12 @@ export default function History() {
           </div>
         ) : (
           <div className="space-y-4">
-            {logs.map((log) => (
+            {sortedLogs.map((log) => (
               <div key={log.id} className="bg-card border rounded-3xl p-5 shadow-sm space-y-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-medium">{log.label}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{formatDate(log.timestamp)}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{formatDate(log.createdAt)}</p>
                   </div>
                   <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 shrink-0">
                     {(log.confidence * 100).toFixed(0)}% Match

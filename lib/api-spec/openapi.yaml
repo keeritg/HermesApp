@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: analyze
     description: Vocalization analysis operations
+  - name: logs
+    description: Vocalization log operations
   - name: anthropic
     description: Anthropic AI chat operations
 paths:
@@ -52,6 +54,50 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AnalyzeError"
+  /logs:
+    get:
+      operationId: getLogs
+      tags: [logs]
+      summary: Get all vocalization logs
+      responses:
+        "200":
+          description: List of vocalization logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VocalizationLog"
+    post:
+      operationId: createLog
+      tags: [logs]
+      summary: Create a new vocalization log entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VocalizationLogInput"
+      responses:
+        "201":
+          description: Created log entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocalizationLog"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogError"
+    delete:
+      operationId: clearLogs
+      tags: [logs]
+      summary: Delete all vocalization logs
+      responses:
+        "204":
+          description: All logs deleted
   /anthropic/conversations:
     get:
       operationId: listAnthropicConversations
@@ -298,6 +344,54 @@ components:
         - createdAt
         - messages
     AnthropicError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    VocalizationLog:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        confidence:
+          type: number
+        context:
+          type: string
+        prediction:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - label
+        - confidence
+        - context
+        - prediction
+        - createdAt
+    VocalizationLogInput:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        confidence:
+          type: number
+        context:
+          type: string
+        prediction:
+          type: string
+      required:
+        - id
+        - label
+        - confidence
+        - prediction
+    LogError:
       type: object
       properties:
         error:

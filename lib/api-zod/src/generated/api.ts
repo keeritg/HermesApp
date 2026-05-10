@@ -39,6 +39,30 @@ export const AnalyzeVocalizationResponse = zod.object({
 });
 
 /**
+ * @summary Get all vocalization logs
+ */
+export const GetLogsResponseItem = zod.object({
+  id: zod.string(),
+  label: zod.string(),
+  confidence: zod.number(),
+  context: zod.string(),
+  prediction: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const GetLogsResponse = zod.array(GetLogsResponseItem);
+
+/**
+ * @summary Create a new vocalization log entry
+ */
+export const CreateLogBody = zod.object({
+  id: zod.string(),
+  label: zod.string(),
+  confidence: zod.number(),
+  context: zod.string().optional(),
+  prediction: zod.string(),
+});
+
+/**
  * @summary List all conversations
  */
 export const ListAnthropicConversationsResponseItem = zod.object({

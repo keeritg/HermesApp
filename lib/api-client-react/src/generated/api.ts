@@ -27,6 +27,9 @@ import type {
   AnthropicMessage,
   AnthropicMessageInput,
   HealthStatus,
+  LogError,
+  VocalizationLog,
+  VocalizationLogInput,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -198,6 +201,238 @@ export const useAnalyzeVocalization = <
   TContext
 > => {
   return useMutation(getAnalyzeVocalizationMutationOptions(options));
+};
+
+/**
+ * @summary Get all vocalization logs
+ */
+export const getGetLogsUrl = () => {
+  return `/api/logs`;
+};
+
+export const getLogs = async (
+  options?: RequestInit,
+): Promise<VocalizationLog[]> => {
+  return customFetch<VocalizationLog[]>(getGetLogsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetLogsQueryKey = () => {
+  return [`/api/logs`] as const;
+};
+
+export const getGetLogsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getLogs>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getLogs>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetLogsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLogs>>> = ({
+    signal,
+  }) => getLogs({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getLogs>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetLogsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getLogs>>
+>;
+export type GetLogsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get all vocalization logs
+ */
+
+export function useGetLogs<
+  TData = Awaited<ReturnType<typeof getLogs>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getLogs>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetLogsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a new vocalization log entry
+ */
+export const getCreateLogUrl = () => {
+  return `/api/logs`;
+};
+
+export const createLog = async (
+  vocalizationLogInput: VocalizationLogInput,
+  options?: RequestInit,
+): Promise<VocalizationLog> => {
+  return customFetch<VocalizationLog>(getCreateLogUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(vocalizationLogInput),
+  });
+};
+
+export const getCreateLogMutationOptions = <
+  TError = ErrorType<LogError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createLog>>,
+    TError,
+    { data: BodyType<VocalizationLogInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createLog>>,
+  TError,
+  { data: BodyType<VocalizationLogInput> },
+  TContext
+> => {
+  const mutationKey = ["createLog"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createLog>>,
+    { data: BodyType<VocalizationLogInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createLog(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateLogMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createLog>>
+>;
+export type CreateLogMutationBody = BodyType<VocalizationLogInput>;
+export type CreateLogMutationError = ErrorType<LogError>;
+
+/**
+ * @summary Create a new vocalization log entry
+ */
+export const useCreateLog = <
+  TError = ErrorType<LogError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createLog>>,
+    TError,
+    { data: BodyType<VocalizationLogInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createLog>>,
+  TError,
+  { data: BodyType<VocalizationLogInput> },
+  TContext
+> => {
+  return useMutation(getCreateLogMutationOptions(options));
+};
+
+/**
+ * @summary Delete all vocalization logs
+ */
+export const getClearLogsUrl = () => {
+  return `/api/logs`;
+};
+
+export const clearLogs = async (options?: RequestInit): Promise<void> => {
+  return customFetch<void>(getClearLogsUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getClearLogsMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof clearLogs>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof clearLogs>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["clearLogs"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof clearLogs>>,
+    void
+  > = () => {
+    return clearLogs(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ClearLogsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof clearLogs>>
+>;
+
+export type ClearLogsMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete all vocalization logs
+ */
+export const useClearLogs = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof clearLogs>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof clearLogs>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getClearLogsMutationOptions(options));
 };
 
 /**

@@ -17,6 +17,22 @@ type LogEntry = {
   prediction: string;
 };
 
+const mapApiLogToEntry = (log: {
+  id: string;
+  label: string;
+  confidence: number;
+  context: string;
+  prediction: string;
+  createdAt: string;
+}): LogEntry => ({
+  id: log.id,
+  timestamp: new Date(log.createdAt).getTime(),
+  label: log.label,
+  confidence: log.confidence,
+  context: log.context,
+  prediction: log.prediction,
+});
+
 export default function Home() {
   const [recording, setRecording] = useState(false);
   const [time, setTime] = useState(0);
@@ -32,9 +48,12 @@ export default function Home() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const recordingHandleRef = useRef<RecordingHandle | null>(null);
 
-  const getHistory = (): LogEntry[] => {
+  const getHistory = async (): Promise<LogEntry[]> => {
     try {
-      return JSON.parse(localStorage.getItem("hermes_logs") || "[]");
+      const res = await fetch("/api/logs");
+      if (!res.ok) return [];
+      const data = await res.json();
+      return (data as Parameters<typeof mapApiLogToEntry>[0][]).map(mapApiLogToEntry);
     } catch {
       return [];
     }
@@ -99,7 +118,7 @@ export default function Home() {
   const handleSaveLog = async () => {
     if (!result) return;
 
-    const history = getHistory();
+    const history = await getHistory();
     setAnalyzing(true);
 
     let prediction = "";
@@ -137,16 +156,34 @@ export default function Home() {
       setAnalyzing(false);
     }
 
-    const newLog: LogEntry = {
-      id: Math.random().toString(36).substring(7),
-      timestamp: Date.now(),
+    const newLog = {
+      id: crypto.randomUUID(),
       label: result.label,
       confidence: result.confidence,
       context: contextText,
       prediction,
     };
 
-    localStorage.setItem("hermes_logs", JSON.stringify([...history, newLog]));
+    try {
+      const saveRes = await fetch("/api/logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newLog),
+      });
+      if (!saveRes.ok) {
+        const errData = await saveRes.json().catch(() => ({}));
+        const errMsg = (errData as { error?: string }).error ?? "Could not save the log. Please try again.";
+        toast({ title: "Save failed", description: errMsg });
+        return;
+      }
+    } catch {
+      toast({
+        title: "Save failed",
+        description: "Could not reach the server. Please try again.",
+      });
+      return;
+    }
+
     setLogSaved(true);
 
     if (needsMoreData) {

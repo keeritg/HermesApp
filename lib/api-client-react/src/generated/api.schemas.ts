@@ -66,3 +66,24 @@ export interface AnthropicConversationWithMessages {
 export interface AnthropicError {
   error: string;
 }
+
+export interface VocalizationLog {
+  id: string;
+  label: string;
+  confidence: number;
+  context: string;
+  prediction: string;
+  createdAt: string;
+}
+
+export interface VocalizationLogInput {
+  id: string;
+  label: string;
+  confidence: number;
+  context?: string;
+  prediction: string;
+}
+
+export interface LogError {
+  error: string;
+}
