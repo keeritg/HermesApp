@@ -76,7 +76,7 @@ function computeSpectralCentroid(
 function classifyVocalization(f: AudioFeatures): AudioClassification {
   const { durationSeconds, dominantFrequencyHz, rmsAmplitude, zeroCrossingRate, spectralCentroid } = f;
 
-  if (rmsAmplitude < 0.005) {
+  if (rmsAmplitude < 0.025) {
     return { label: "Silent / No vocalization", confidence: 0.88, features: f };
   }
 
@@ -91,14 +91,14 @@ function classifyVocalization(f: AudioFeatures): AudioClassification {
     "Silent / No vocalization": 0,
   };
 
-  // Purr: very low dominant freq (25–150 Hz), low ZCR, rhythmic
-  if (dominantFrequencyHz >= 20 && dominantFrequencyHz <= 200) {
+  // Purr: very low dominant freq (25–150 Hz), low ZCR, rhythmic, needs meaningful amplitude
+  if (dominantFrequencyHz >= 20 && dominantFrequencyHz <= 200 && rmsAmplitude > 0.04) {
     scores["Purr (contentment)"] += 3;
   }
-  if (zeroCrossingRate < 0.05) {
+  if (zeroCrossingRate < 0.05 && rmsAmplitude > 0.04) {
     scores["Purr (contentment)"] += 2;
   }
-  if (durationSeconds > 1.5) {
+  if (durationSeconds > 1.5 && rmsAmplitude > 0.04) {
     scores["Purr (contentment)"] += 1;
   }
 

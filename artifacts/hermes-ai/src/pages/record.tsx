@@ -24,11 +24,11 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import {
   storage,
-  classifyByDuration,
   buildContext,
   makeId,
   type Recording,
 } from "@/lib/storage";
+import { analyzeAudioBlob } from "@/lib/audio-analyzer";
 
 const LOCATION_TAGS = [
   "Kitchen",
@@ -202,16 +202,28 @@ export default function Record() {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
-      mr.onstop = () => {
+      mr.onstop = async () => {
         const durationSecs = (Date.now() - startTimeRef.current) / 1000;
-        const { label, confidence } = classifyByDuration(durationSecs);
+        const blob = new Blob(chunksRef.current, {
+          type: mr.mimeType || "audio/webm",
+        });
         stopWaveform();
         streamRef.current?.getTracks().forEach((t) => t.stop());
         setPhase("processing");
-        setTimeout(() => {
-          setResult({ label, confidence, durationSecs });
+        try {
+          const classification = await analyzeAudioBlob(blob);
+          setResult({
+            label: classification.label,
+            confidence: classification.confidence,
+            durationSecs,
+          });
           setPhase("tagging");
-        }, 1200);
+        } catch {
+          setPhase("idle");
+          setMicError(
+            "Couldn't analyze the recording. Please try again.",
+          );
+        }
       };
 
       mr.start();
@@ -521,7 +533,36 @@ export default function Record() {
             </motion.div>
           )}
 
-          {phase === "tagging" && result && (
+          {phase === "tagging" && result && result.label === "Silent / No vocalization" && (
+            <motion.div
+              key="silent"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="space-y-6"
+            >
+              <div className="bg-muted/50 border border-border rounded-3xl p-8 flex flex-col items-center text-center space-y-4">
+                <div className="text-3xl">🔇</div>
+                <div>
+                  <h2 className="text-lg font-semibold">No vocalization detected</h2>
+                  <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+                    The recording was too quiet or didn't contain a recognizable sound. Make sure your microphone is close to Leo when he vocalizes.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setResult(null);
+                  setPhase("idle");
+                }}
+                className="w-full bg-foreground text-background font-medium text-base py-4 rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all duration-150"
+              >
+                Try Again
+              </button>
+            </motion.div>
+          )}
+
+          {phase === "tagging" && result && result.label !== "Silent / No vocalization" && (
             <motion.div
               key="tagging"
               initial={{ opacity: 0, y: 12 }}
