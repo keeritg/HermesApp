@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { startRecording, analyzeAudioBlob, type RecordingHandle } from "@/lib/audio-analyzer";
+import { WaveformVisualizer } from "@/components/waveform-visualizer";
 
 type LogEntry = {
   id: string;
@@ -45,6 +46,8 @@ export default function Home() {
   const [contextText, setContextText] = useState("");
   const { toast } = useToast();
 
+  const [recordingStream, setRecordingStream] = useState<MediaStream | null>(null);
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const recordingHandleRef = useRef<RecordingHandle | null>(null);
 
@@ -63,6 +66,7 @@ export default function Home() {
     if (recording) {
       setRecording(false);
       setProcessing(true);
+      setRecordingStream(null);
       if (timerRef.current) clearInterval(timerRef.current);
       recordingHandleRef.current?.stop();
       recordingHandleRef.current = null;
@@ -107,6 +111,7 @@ export default function Home() {
       }
 
       recordingHandleRef.current = handle;
+      setRecordingStream(handle.stream);
       setRecording(true);
       setTime(0);
       timerRef.current = setInterval(() => {
@@ -267,6 +272,8 @@ export default function Home() {
               </div>
             </Button>
           </div>
+
+          <WaveformVisualizer stream={recordingStream} active={recording} />
 
           <div className="h-40 w-full flex items-center justify-center">
             <AnimatePresence mode="wait">

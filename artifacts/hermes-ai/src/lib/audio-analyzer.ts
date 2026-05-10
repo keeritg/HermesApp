@@ -212,6 +212,7 @@ export async function analyzeAudioBlob(blob: Blob): Promise<AudioClassification>
 
 export interface RecordingHandle {
   stop: () => void;
+  stream: MediaStream;
 }
 
 export function startRecording(onComplete: (blob: Blob) => void): Promise<RecordingHandle> {
@@ -240,6 +241,7 @@ export function startRecording(onComplete: (blob: Blob) => void): Promise<Record
     recorder.start();
 
     resolve({
+      stream,
       stop: () => {
         if (recorder.state !== "inactive") {
           recorder.stop();
