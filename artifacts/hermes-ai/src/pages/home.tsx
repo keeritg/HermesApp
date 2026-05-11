@@ -6,8 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
-import { startRecording, analyzeAudioBlob, type RecordingHandle } from "@/lib/audio-analyzer";
+import { startRecording, analyzeAudioBlob, type AudioClassification, type RecordingHandle, type VocalizationLabel } from "@/lib/audio-analyzer";
 import { WaveformVisualizer } from "@/components/waveform-visualizer";
+
+const VOCALIZATION_DESCRIPTIONS: Record<VocalizationLabel, string> = {
+  "Short meow (attention)": "A quick, single-note call typically used to get your attention or say hello.",
+  "Long meow (demanding)": "An extended, insistent meow often used to demand food, play, or access to a room.",
+  "Yowl (distress or mating)": "A drawn-out, low cry that can signal distress, disorientation, or mating instinct.",
+  "Purr (contentment)": "Typically indicates relaxation or a request for closeness and comfort.",
+  "Chirp / Chatter (prey-focused)": "A rapid, stuttering sound usually directed at birds or small animals outside a window.",
+  "Trill (greeting)": "A soft, rolling sound cats use to greet people or other cats they feel friendly toward.",
+  "Hiss (defensive)": "A warning signal indicating fear, discomfort, or a desire to be left alone.",
+  "Silent / No vocalization": "No clear vocalization was detected in this recording.",
+};
 
 type LogEntry = {
   id: string;
@@ -39,7 +50,7 @@ export default function Home() {
   const [time, setTime] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState<null | { label: string; confidence: number }>(null);
+  const [result, setResult] = useState<AudioClassification | null>(null);
   const [logSaved, setLogSaved] = useState(false);
   const [contextAdded, setContextAdded] = useState(false);
   const [showContextInput, setShowContextInput] = useState(false);
@@ -87,7 +98,7 @@ export default function Home() {
         handle = await startRecording(async (blob) => {
           try {
             const classification = await analyzeAudioBlob(blob);
-            setResult({ label: classification.label, confidence: classification.confidence });
+            setResult(classification);
           } catch {
             setProcessing(false);
             toast({
@@ -322,7 +333,7 @@ export default function Home() {
 
                   <div className="space-y-1">
                     <h3 className="text-2xl font-semibold">{result.label}</h3>
-                    <p className="text-sm text-muted-foreground">Matches typical patterns for hunger or soliciting attention.</p>
+                    <p className="text-sm text-muted-foreground">{VOCALIZATION_DESCRIPTIONS[result.label] ?? result.label}</p>
                   </div>
 
                   {showContextInput ? (
