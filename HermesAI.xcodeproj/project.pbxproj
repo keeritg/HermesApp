@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1F677B152F803D4900C9F116 /* VocalizationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F677B142F803D4900C9F116 /* VocalizationType.swift */; };
-		1F6F29122F3FC8FC009A173B /* AudioAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6F29112F3FC8FC009A173B /* AudioAnalyzer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,12 +27,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1F677B142F803D4900C9F116 /* VocalizationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocalizationType.swift; sourceTree = "<group>"; };
 		1F6F28DE2F3FC631009A173B /* HermesAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HermesAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F6F28EE2F3FC634009A173B /* HermesAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HermesAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F6F28F82F3FC634009A173B /* HermesAIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HermesAIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F6F29102F3FC7C6009A173B /* HermesAI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "HermesAI-Info.plist"; sourceTree = "<group>"; };
-		1F6F29112F3FC8FC009A173B /* AudioAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAnalyzer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -83,8 +78,7 @@
 		1F6F28D52F3FC631009A173B = {
 			isa = PBXGroup;
 			children = (
-				1F6F29102F3FC7C6009A173B /* HermesAI-Info.plist */,
-				1F6F290B2F3FC6DD009A173B /* Models */,
+				1F6F28E02F3FC631009A173B /* HermesAI */,
 				1F6F28F12F3FC634009A173B /* HermesAITests */,
 				1F6F28FB2F3FC634009A173B /* HermesAIUITests */,
 				1F6F28DF2F3FC631009A173B /* Products */,
@@ -99,48 +93,6 @@
 				1F6F28F82F3FC634009A173B /* HermesAIUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		1F6F290B2F3FC6DD009A173B /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				1F6F290C2F3FC6F3009A173B /* Views */,
-				1F677B142F803D4900C9F116 /* VocalizationType.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		1F6F290C2F3FC6F3009A173B /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				1F6F290D2F3FC6FF009A173B /* ViewModels */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		1F6F290D2F3FC6FF009A173B /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				1F6F290E2F3FC70A009A173B /* Services */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		1F6F290E2F3FC70A009A173B /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				1F6F290F2F3FC713009A173B /* Utilities */,
-				1F6F29112F3FC8FC009A173B /* AudioAnalyzer.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		1F6F290F2F3FC713009A173B /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				1F6F28E02F3FC631009A173B /* HermesAI */,
-			);
-			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -287,8 +239,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F6F29122F3FC8FC009A173B /* AudioAnalyzer.swift in Sources */,
-				1F677B152F803D4900C9F116 /* VocalizationType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,18 +398,18 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_ASSET_PATHS = "\"HermesAI/Preview Content\"";
 				DEVELOPMENT_TEAM = T4X97KJP49;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "HermesAI-Info.plist";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Hermes AI needs camera access to analyze your cat's body language, tail position, and ear movements.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Hermes AI needs microphone access to analyze your cat's vocalizations and understand their communication.";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = HermesAI;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "HermesAI uses the microphone to record your cat's sounds so you can log them and spot changes over time.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -480,18 +430,18 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_ASSET_PATHS = "\"HermesAI/Preview Content\"";
 				DEVELOPMENT_TEAM = T4X97KJP49;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "HermesAI-Info.plist";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Hermes AI needs camera access to analyze your cat's body language, tail position, and ear movements.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Hermes AI needs microphone access to analyze your cat's vocalizations and understand their communication.";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = HermesAI;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "HermesAI uses the microphone to record your cat's sounds so you can log them and spot changes over time.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
